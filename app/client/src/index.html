@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Hapi Fire</title>
+        <base href="/">
+        <meta name="description" content="Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.">
+        <meta name="author" content="Willmer Barahona">
+        <meta name="generator" content="Gulp Hapi" />
+
+        <link rel="canonical" href="http://localhost:8000" />
+        <link rel="home" href="http://www.domain.com" />
+        <!-- <link rel="icon" type="image/x-icon" href="/favicon.ico" /> -->
+
+        <!-- <link rel="stylesheet" href="/assets/css/styles.min.css"> -->
+
+        <!--[if lt IE 9]>
+            <script type="text/javascript" src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <header>
+            <h1>Hapi Fire App</h1>
+        </header>
+        <main id="view-wrapper" class=""></main>
+        <footer>
+            <h2>register</h2>
+            <form class="" name="register" id="registerForm">
+                <input type="text" name="fname" value="" required placeholder="first name"/><br />
+                <input type="text" name="lname" value="" required placeholder="last name"/><br />
+                <input type="email" name="email" value="" required placeholder="example@domain.com" /><br />
+                <input type="password" name="password" value="" required placeholder="password"/><br />
+                <input type="submit" name="submitRegister" value="Register" />
+            </form>
+            <br />
+            <h2>edit info (login first then click user info)</h2>
+            <form class="" name="edit" id="editInfoForm">
+                <input type="number" name="age" value="" required placeholder="age" /><br />
+                <input type="text" name="fname" value="" required placeholder="first name"/><br />
+                <input type="text" name="lname" value="" required placeholder="last name"/><br />
+                <input type="submit" name="submitEdit" value="Edit" />
+            </form>
+            <br />
+            <h2>login</h2>
+            <form class="" name="login" id="loginForm">
+                <input type="email" name="email" value="" required placeholder="example@domain.com" /><br />
+                <input type="password" name="password" required value="" placeholder="password"/><br />
+                <button type="submit" name="submitLogin">Login</button>
+            </form>
+            <br />
+            <h2>forgot password</h2>
+            <form class="" name="forgotpwd" id="forgotpwdForm">
+                <input type="email" name="email" value="" required placeholder="example@domain.com" /><br />
+                <button type="submit" name="submitForgot">Send recovery</button>
+            </form>
+            <br />
+            <h2>change password</h2>
+            <form class="" name="changepwd" id="changepwdForm">
+                <input type="email" name="email" value="" required placeholder="example@domain.com" /><br />
+                <input type="password" name="oldpassword" required value="" placeholder="old password"/><br />
+                <input type="password" name="password" required value="" placeholder="new password"/><br />
+                <button type="submit" name="submitChange">Change password</button>
+            </form>
+            <br />
+            <h2>unsubscribe</h2>
+            <form class="" name="unsubscribe" id="unsubscribeForm">
+                <input type="email" name="email" value="" required placeholder="example@domain.com" /><br />
+                <input type="password" name="password" required value="" placeholder="password"/><br />
+                <button type="submit" name="submitUnsubscribe">Unsubscribe</button>
+            </form>
+            <br /><br />
+            <button type="button" name="fetchuser">User Info</button>
+            <button type="button" name="logoff">Logoff</button><br><br>
+        </footer>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script type="text/javascript">
+            var dfda = $.Deferred();
+            var dfdb = $.Deferred();
+            var dfdc = $.Deferred();
+            var dfdd = $.Deferred();
+            var dfde = $.Deferred();
+            var dfdf = $.Deferred();
+            var dfdg = $.Deferred();
+            var dfdh = $.Deferred();
+            var dfdi = $.Deferred();
+            var dfdj = $.Deferred();
+
+            function randomId () {
+                return '-'+Math.random().toString(36).slice(2);
+            }
+
+            function setUser (id, userInf) {
+                var user        = userInf;
+                var meth        = (id) ? 'PUT' : 'POST';
+                var url         = (id) ? 'http://localhost:8001/api/v1/user/'+id : 'http://localhost:8001/api/v1/user';
+
+                $.ajax({
+                    url: url,
+                    method: meth,
+                    data: user,
+                    success: function (response) {
+                        dfda.resolve(response);
+                    }
+                });
+                return dfda.promise();
+            }
+
+            function getUsers (id) {
+                $.ajax({
+                    url: 'http://localhost:8001/api/v1/user/'+id,
+                    method: 'GET',
+                    success: function (response) {
+                        dfdb.resolve(response);
+                    }
+                });
+                return dfdb.promise();
+            }
+
+            function deleteUser (id) {
+                $.ajax({
+                    url: 'http://localhost:8001/api/v1/user/'+id,
+                    method: 'DELETE',
+                    success: function (response) {
+                        dfdc.resolve(response);
+                    }
+                });
+                return dfdc.promise();
+            }
+
+            function login (uData) {
+                var authData            = {};
+
+                if (uData) {
+                    authData.email      = uData.email;
+                    authData.password   = uData.password;
+                } else {
+                    authData.email      = $('#loginForm [name=email]').val();
+                    authData.password   = $('#loginForm [name=password]').val();
+                }
+
+                $.ajax({
+                    url: 'http://localhost:8001/api/v1/auth',
+                    method: 'POST',
+                    data: authData,
+                    success: function (response) {
+                        dfdd.resolve(response);
+                    }
+                });
+                return dfdd.promise();
+            }
+
+            function resetpwd () {
+                var userInfo            = {};
+                    userInfo.email      = $('#forgotpwdForm [name=email]').val();
+
+                $.ajax({
+                    url: 'http://localhost:8001/api/v1/resetpassword',
+                    method: 'POST',
+                    data: userInfo,
+                    success: function (response) {
+                        dfdi.resolve(response);
+                    }
+                });
+                return dfdi.promise();
+            }
+
+            function changepwd () {
+                var userInfo                = {};
+                    userInfo.email          = $('#changepwdForm [name=email]').val();
+                    userInfo.password       = $('#changepwdForm [name=password]').val();
+                    userInfo.oldpassword    = $('#changepwdForm [name=oldpassword]').val();
+
+                $.ajax({
+                    url: 'http://localhost:8001/api/v1/changepassword',
+                    method: 'POST',
+                    data: userInfo,
+                    success: function (response) {
+                        dfdi.resolve(response);
+                    }
+                });
+                return dfdi.promise();
+            }
+
+            function logout () {
+                var authData            = {};
+                    authData.email      = $('#loginForm [name=email]').val();
+                    authData.password   = $('#loginForm [name=password]').val();
+
+                $.ajax({
+                    url: 'http://localhost:8001/api/v1/unauth',
+                    method: 'POST',
+                    data: authData,
+                    success: function (response) {
+                        dfde.resolve(response);
+                    }
+                });
+                return dfde.promise();
+            }
+
+            function unsubs () {
+                var authData            = {};
+                authData.email      = $('#unsubscribeForm [name=email]').val();
+                authData.password   = $('#unsubscribeForm [name=password]').val();
+
+                $.ajax({
+                    url: 'http://localhost:8001/api/v1/unsubscribe',
+                    method: 'POST',
+                    data: authData,
+                    success: function (response) {
+                        dfdh.resolve(response);
+                    }
+                });
+                return dfdh.promise();
+            }
+
+            function register (uinfo) {
+                $.ajax({
+                    url: 'http://localhost:8001/api/v1/registration',
+                    data: uinfo,
+                    method: 'POST',
+                    success: function (response) {
+                        dfdg.resolve(response);
+                    }
+                });
+
+                return dfdg.promise();
+            }
+
+            $('[name=submitForgot]').click(function (event) {
+                event.preventDefault();
+
+                resetpwd().then(function (forgotResp) {
+                    console.log(forgotResp);
+                });
+            });
+
+            $('[name=submitChange]').click(function (event) {
+                event.preventDefault();
+
+                changepwd().then(function (changeResp) {
+                    console.log(changeResp);
+                });
+            })
+
+            $('[name=submitRegister]').click(function (event) {
+                event.preventDefault();
+                var userData = {
+                  'age' : 0,
+                  'code' : '',
+                  'email' : $('#registerForm [name=email]').val(),
+                  'fname' : $('#registerForm [name=fname]').val(),
+                  'lname' : $('#registerForm [name=lname]').val(),
+                  'password' : $('#registerForm [name=password]').val(),
+                  'role' : {
+                    'accesses' : {
+                      'users' : false
+                    }
+                  }
+                };
+
+                register(userData).then(function (response) {
+                    console.log(response);
+
+                    userData.code = response.data.uid;
+                    userData.uid = response.data.uid;
+
+                    if (response.statusCode === 201) {
+                        setUser(null, userData).then(function (userResp) {
+                            console.log(userResp);
+                            $('#view-wrapper').html(JSON.stringify(userResp));
+                        });
+                    } else {
+                        $('#view-wrapper').html(JSON.stringify(response));
+                    }
+                },function (error) {
+                    console.log(error);
+                    $('#view-wrapper').html(JSON.stringify(error));
+                });
+            });
+
+            $('[name=submitEdit]').click(function (event) {
+                event.preventDefault();
+                var userData = {
+                  'age' : $('#editInfoForm [name=age]').val(),
+                  'code' : localStorage.uid,
+                  'email' : $('#editInfoForm [name=email]').val(),
+                  'fname' : $('#editInfoForm [name=fname]').val(),
+                  'lname' : $('#editInfoForm [name=lname]').val(),
+                  'password' : $('#editInfoForm [name=password]').val(),
+                  'role' : {
+                    'accesses' : {
+                      'users' : false
+                    }
+                  }
+                };
+
+                if (localStorage.uid !== '') {
+                    setUser(localStorage.uid, userData).then(function (userResp) {
+                        console.log(userResp);
+                        $('#view-wrapper').html(JSON.stringify(userResp));
+                    },function (error) {
+                        console.log(error);
+                        $('#view-wrapper').html(JSON.stringify(error));
+                    });
+                }
+            });
+
+            $('[name=logoff]').click(function (event) {
+                event.preventDefault();
+
+                logout().then(function (resp) {
+                    console.log(resp);
+                    $('#view-wrapper').html(JSON.stringify(resp));
+                    localStorage.uid = '';
+                    localStorage.token = '';
+                    $('#editInfoForm [name=age]').val('');
+                    $('#editInfoForm [name=fname]').val('');
+                    $('#editInfoForm [name=lname]').val('');
+                },function (error) {
+                    console.log(error);
+                    $('#view-wrapper').html(JSON.stringify(error));
+                });
+            });
+
+            $('[name=submitLogin]').click(function (event) {
+                event.preventDefault();
+
+                login().then(function (resp) {
+                    console.log(resp);
+                    $('#view-wrapper').html(JSON.stringify(resp));
+                    if (resp.statusCode === 200) {
+                        localStorage.setItem('token', resp.data.token);
+                        localStorage.setItem('uid', resp.data.uid);
+                    }
+                });
+            });
+
+            $('[name=submitUnsubscribe]').click(function (event) {
+                event.preventDefault();
+
+                if (localStorage.token !== '' && localStorage.uid !== '') {
+                    deleteUser(localStorage.uid).then(function (delUserResp) {
+                        unsubs().then(function (resp) {
+                            console.log(resp);
+                            localStorage.uid = '';
+                            localStorage.token = '';
+                            $('#view-wrapper').html(JSON.stringify(resp));
+                        });
+                    });
+                }
+            });
+
+            $('[name=fetchuser]').click(function (event) {
+                event.preventDefault();
+
+                console.log(localStorage.uid);
+                if (localStorage.uid || localStorage.uid !== '') {
+                    getUsers(localStorage.uid).then(function (respa) {
+                        console.log(respa);
+                        $('#view-wrapper').html(JSON.stringify(respa));
+
+                        if (respa.statusCode === 200) {
+                            $('#editInfoForm [name=age]').val(respa.data.age);
+                            $('#editInfoForm [name=fname]').val(respa.data.fname);
+                            $('#editInfoForm [name=lname]').val(respa.data.lname);
+                        }
+                    });
+                } else {
+                    $('#view-wrapper').html('User is not logged in');
+                }
+            });
+        </script>
+    </body>
+</html>
